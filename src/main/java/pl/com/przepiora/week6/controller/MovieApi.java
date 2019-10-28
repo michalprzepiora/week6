@@ -31,5 +31,4 @@ public class MovieApi {
   public void addMovie(@RequestBody Movie movie){
     repository.save(movie);
   }
-
 }

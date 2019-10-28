@@ -2,30 +2,36 @@ package pl.com.przepiora.week6.aspect;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Aspect
 @Component
-public class MovieMailAspect  {
+public class MovieMailAspect {
 
-  @Autowired
-  private JavaMailSender mailSender;
+    private final Logger log = LoggerFactory.getLogger(MovieMailAspect.class);
 
-  @Before("execution(void pl.com.przepiora.week6.controller.MovieApi.addMovie(*))")
-  public void test(){
-    System.out.println("start");
+    private final JavaMailSender mailSender;
 
-    SimpleMailMessage message = new SimpleMailMessage();
-    message.setTo("michal.przepiora@gmail.com");
-    message.setSubject("Test spring mail");
-    message.setText("To jest tresc wiadomosci");
-    mailSender.send(message);
+    public MovieMailAspect(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
-    System.out.println("stop");
-
-  }
+    @Before("execution(void pl.com.przepiora.week6.controller.MovieApi.addMovie(*))")
+    public void test() {
+        SimpleMailMessage message = new SimpleMailMessage();
+        String date = LocalDateTime.now().toString();
+        log.info("Mail is sending...");
+        message.setTo("michal.przepiora@gmail.com");
+        message.setSubject("Information");
+        message.setText("New movie was added to repository. \n" + date);
+        mailSender.send(message);
+        log.info("Mail was send.");
+    }
 
 }
